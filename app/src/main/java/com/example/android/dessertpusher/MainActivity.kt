@@ -18,6 +18,7 @@ package com.example.android.dessertpusher
 
 import android.content.ActivityNotFoundException
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -27,11 +28,13 @@ import androidx.core.app.ShareCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleObserver
 import com.example.android.dessertpusher.databinding.ActivityMainBinding
-
+import timber.log.Timber
+const val KEY_REVENUE = "key_revenue"
 class MainActivity : AppCompatActivity(), LifecycleObserver {
 
     private var revenue = 0
     private var dessertsSold = 0
+    private lateinit var dessertTimer: DessertTimer
 
     // Contains all the views
     private lateinit var binding: ActivityMainBinding
@@ -59,20 +62,32 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i("Main Activity", "onCreate Called")
+        Timber.i("onCreate Called")
+        dessertsSold = 0
         // Use Data Binding to get reference to the views
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         binding.dessertButton.setOnClickListener {
             onDessertClicked()
         }
+        dessertTimer = DessertTimer(this.lifecycle)
 
+        if (savedInstanceState != null){
+            revenue = savedInstanceState.getInt(KEY_REVENUE, 0)
+        }
         // Set the TextViews to the right values
         binding.revenue = revenue
         binding.amountSold = dessertsSold
 
         // Make sure the correct dessert is showing
         binding.dessertButton.setImageResource(currentDessert.imageId)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_REVENUE,revenue)
+        Timber.i("onSaveInstance is here")
+
     }
 
     /**
@@ -135,6 +150,11 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        Timber.i("Restore Called")
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.shareMenuButton -> onShare()
@@ -144,6 +164,31 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
 
     override fun onStart() {
         super.onStart()
-        Toast.makeText(this,"onStart Created", Toast.LENGTH_SHORT).show()
+        Timber.i("onStart Created")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("onResume Created")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Timber.i("onStop Created")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Timber.i("onPause Created")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.i("onDestroy Created")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Timber.i("onRestart Created")
     }
 }
